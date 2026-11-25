@@ -1,0 +1,140 @@
+Project 20: University Course Registration and Timetable System 
+Problem 
+Statement 
+Key Features 
+and Modules 
+Key Tables 
+Business Rules 
+Registering for courses involves prerequisites, seat limits and 
+timetable clashes. Build a database that enforces all 
+registration rules. 
+• Course & Prerequisite Master 
+• Section & Timetable 
+• Registration 
+• Waitlist 
+• Faculty Allocation 
+• Reports 
+• Credit limits per term 
+• Faculty availability and workload 
+• Room allocation and capacity 
+• Add-drop period 
+• students 
+• courses 
+• course_prerequisites 
+• sections 
+• time_slots 
+• rooms 
+• faculty 
+• registrations 
+• waitlist 
+• A student can register for 18 to 24 credits 
+• Drops are allowed only in the add-drop window 
+• Rooms cannot exceed capacity 
+• A faculty member teaches at most 12 hours per week 
+Page 103 
+Triggers 
+MySQL Project Ideas (Detailed) 
+• BEFORE INSERT on registrations rejects clashing time 
+slots 
+• BEFORE INSERT checks prerequisites passed 
+• AFTER UPDATE on registrations (dropped) promotes the 
+first waitlisted student 
+• BEFORE INSERT on registrations enforces the credit limit 
+• BEFORE UPDATE on registrations blocks drops after the 
+window 
+• BEFORE INSERT on sections rejects a room or faculty 
+clash 
+• AFTER INSERT on registrations decrements the seat 
+count 
+Views 
+Indexes 
+• v_student_timetable 
+• v_section_seats 
+• v_faculty_load 
+• v_registration_summary 
+• v_room_utilisation - hours used per room 
+• v_credit_summary - credits per student per term 
+• v_unscheduled_sections - sections without a room 
+• v_waitlist_status - waiting students 
+• Composite index on registrations(student_id, section_id) 
+• Index on sections(course_id, term) 
+• Index on time_slots(day, start_time) 
+• Index on sections(faculty_id, time_slot_id) 
+• Index on sections(room_id, time_slot_id) 
+• Index on waitlist(section_id, position) 
+• Index on course_prerequisites(course_id) 
+Page 104 
+MySQL Project Ideas (Detailed) 
+Stored 
+Procedures 
+• sp_register_course 
+• sp_drop_course 
+• sp_generate_timetable(student) 
+• sp_section_report 
+• sp_add_drop_course(student, section, action) - adds or 
+drops with checks 
+• sp_assign_room(section, room) - allocates a room 
+• sp_close_registration(term) - locks registration 
+• sp_faculty_workload(faculty, term) - hours per week 
+Functions • fn_credits_registered(student_id, term) 
+• fn_seats_left(section_id) 
+
+Page 105 
+MySQL Project Ideas (Detailed) 
+Reporting and 
+Scenario 
+Questions 
+(Mandatory) 
+Q1. [Reporting] List courses whose waitlist is longer than 20 
+percent of the section capacity, with the average waiting time 
+of students. (joins, ratio, DATEDIFF) 
+Q2. [Reporting] Find rooms used for less than 40 percent of 
+available weekly hours and suggest sections that could be 
+moved into them. (aggregation, NOT EXISTS) 
+Q3. [Reporting] Show the complete prerequisite chain with 
+depth for a given course and list all students who already 
+satisfy every course in the chain. (recursive CTE, NOT 
+EXISTS) 
+Q4. [Reporting] List students registered below the minimum 
+or above the maximum credits for the term, with the 
+difference. (CASE, SUM, HAVING) 
+Q5. [Reporting] Show each faculty member's weekly 
+teaching hours and the percentage of the limit, ranking the 
+most loaded. (SUM, RANK) 
+Q6. [Reporting] Detect timetable clashes between any two 
+sections registered by the same student, showing both course 
+names and time slot. (self join on registrations and 
+time_slots) 
+Q7. [Reporting] Show fill rate for each section and the rank 
+of the section within its course, listing sections below 50 
+percent. (ratio, RANK PARTITION BY) 
+Q8. [Scenario] A student tries to register for two sections 
+that share the same day and time slot. Show the trigger 
+blocking the second and the message that names the clashing 
+course. (BEFORE INSERT trigger, join) 
+Q9. [Scenario] A student registers for a course whose 
+prerequisite was passed only as a backlog (failed first). Show 
+the check using the latest pass result and the outcome. 
+(trigger, subquery on results) 
+Page 106 
+MySQL Project Ideas (Detailed) 
+Q10. [Scenario] A student with a confirmed seat drops the 
+course while three students wait. Show the first waitlisted 
+student promoted, the waitlist positions renumbered and seat 
+counts updated in one transaction. (AFTER UPDATE trigger, 
+ROW_NUMBER) 
+Q11. [Scenario] A student with 22 credits adds a 4-credit 
+course with a limit of 24. Show the credit-limit trigger 
+rejecting it and how a 2-credit course is accepted. (trigger, 
+SUM) 
+Q12. [Scenario] A drop is requested on the day after the 
+add-drop window closed. Show the trigger rejecting it and the 
+special-permission procedure that records dean approval. 
+(trigger, procedure) 
+Object Count Triggers: 7   |   Views: 8   |   Indexes: 7   |   Stored procedures: 
+8   |   Functions: 2   |   Questions: 12 
+Expected 
+Outcome 
+Registration succeeds only when prerequisites and timetable 
+rules pass, and a student can print their weekly timetable from 
+a view
